@@ -86988,14 +86988,19 @@ gxp.plugins.GeoServerStyleWriter = Ext.extend(gxp.plugins.StyleWriter, {
     writeStyle: function(styleRec, dispatchQueue) {
         var styleName = styleRec.get("userStyle").name;
         var layerName = this.target.layerRecord.get("name");
+        // support workspace
+        var workspace = null;
         if (layerName.indexOf(':') >= 0) {
+            workspace = layerName.split(':')[0]
             layerName = layerName.split(':')[1]
         }
         dispatchQueue.push(function(callback, storage) {
             Ext.Ajax.request({
                 method: styleRec.phantom === true ? "POST" : "PUT",
-                url: this.baseUrl + "/styles" + (styleRec.phantom === true ?
-                    "" : "/" + styleName + ".xml?raw=true"),
+                // support workspace
+                // TODO: fix issue of global sytles
+                url: this.baseUrl +(workspace ? "/workspaces/"+ workspace : "" ) +
+                    "/styles" + (styleRec.phantom === true ? "" : "/" + styleName + ".xml?raw=true"),
                 headers: {
                     "Content-Type": "application/vnd.ogc.sld+xml"
                 },
